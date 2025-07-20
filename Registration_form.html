@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>
+        User Registration
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&amp;family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #9AAE8E;
+        }
+
+        .header-text {
+            font-family: 'Indie Flower', cursive;
+            font-size: 2.5rem;
+            color: #D97D54;
+        }
+
+        .sub-header-text {
+            font-family: 'Indie Flower', cursive;
+            font-size: 2rem;
+            color: #D97D54;
+        }
+
+        .form-label {
+            color: #D97D54;
+        }
+
+        .register-btn {
+            background-color: #00A86B;
+            color: white;
+        }
+
+        .warning-text {
+            color: red;
+            font-size: 0.875rem;
+        }
+
+        .strength-indicator {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .strength-weak {
+            color: red;
+        }
+
+        .strength-medium {
+            color: orange;
+        }
+
+        .strength-strong {
+            color: green;
+        }
+
+        .popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .popup-success {
+            border-color: green;
+            color: green;
+        }
+
+        .popup-error {
+            border-color: red;
+            color: red;
+        }
+    </style>
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById('profileImage');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function validateForm() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const gender = document.getElementById('gender').value;
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const termsWarning = document.getElementById('termsWarning');
+
+            let isValid = true;
+
+            if (!firstName) {
+                document.getElementById('firstNameWarning').textContent = "First Name is required!";
+                isValid = false;
+            } else if (!/^[A-Za-z]+$/.test(firstName)) {
+                document.getElementById('firstNameWarning').textContent = "First Name can only contain alphabets!";
+                isValid = false;
+            } else {
+                document.getElementById('firstNameWarning').textContent = "";
+            }
+
+            if (!lastName) {
+                document.getElementById('lastNameWarning').textContent = "Last Name is required!";
+                isValid = false;
+            } else if (!/^[A-Za-z]+$/.test(lastName)) {
+                document.getElementById('lastNameWarning').textContent = "Last Name can only contain alphabets!";
+                isValid = false;
+            } else {
+                document.getElementById('lastNameWarning').textContent = "";
+            }
+
+            if (!email) {
+                document.getElementById('emailWarning').textContent = "Email Address is required!";
+                isValid = false;
+            } else {
+                document.getElementById('emailWarning').textContent = "";
+            }
+
+            if (!password) {
+                document.getElementById('passwordWarning').textContent = "Password is required!";
+                isValid = false;
+            } else {
+                document.getElementById('passwordWarning').textContent = "";
+            }
+
+            if (!confirmPassword) {
+                document.getElementById('confirmPasswordWarning').textContent = "Confirm Password is required!";
+                isValid = false;
+            } else {
+                document.getElementById('confirmPasswordWarning').textContent = "";
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('passwordMatchWarning').textContent = "Passwords do not match!";
+                isValid = false;
+            } else {
+                document.getElementById('passwordMatchWarning').textContent = "";
+            }
+
+            if (!dateOfBirth) {
+                document.getElementById('dateOfBirthWarning').textContent = "Date of Birth is required!";
+                isValid = false;
+            } else {
+                document.getElementById('dateOfBirthWarning').textContent = "";
+            }
+
+            if (!gender) {
+                document.getElementById('genderWarning').textContent = "Gender is required!";
+                isValid = false;
+            } else {
+                document.getElementById('genderWarning').textContent = "";
+            }
+
+            if (!termsCheckbox.checked) {
+                termsWarning.textContent = "You must agree to the terms and conditions!";
+                isValid = false;
+            } else {
+                termsWarning.textContent = "";
+            }
+
+            return isValid;
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthIndicator = document.getElementById('strengthIndicator');
+
+            let strength = 'weak';
+            let strengthClass = 'strength-weak';
+
+            if (password.length >= 8) {
+                strength = 'medium';
+                strengthClass = 'strength-medium';
+            }
+
+            if (password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) {
+                strength = 'strong';
+                strengthClass = 'strength-strong';
+            }
+
+            strengthIndicator.textContent = `Password strength: ${strength}`;
+            strengthIndicator.className = `strength-indicator ${strengthClass}`;
+        }
+
+        function showPopup(message, isSuccess) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.className = `popup ${isSuccess ? 'popup-success' : 'popup-error'}`;
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+
+        function confirmSubmission(event) {
+            event.preventDefault();
+            if (confirm("Are you sure all the details are correct and you want to submit?")) {
+                if (validateForm()) {
+                    showPopup("Registration successful!", true);
+                } else {
+                    showPopup("There are errors in the form. Please correct them and try again.", false);
+                }
+            }
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('profileUpload').click();
+        }
+    </script>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg relative w-full max-w-md">
+        <div class="text-center mb-6">
+            <h1 class="header-text">
+                Vault of Codes
+            </h1>
+            <h2 class="sub-header-text">
+                User Registration
+            </h2>
+        </div>
+        <form onsubmit="confirmSubmission(event)">
+            <div class="flex justify-center mb-4">
+                <img alt="Profile photo placeholder" class="w-16 h-16 rounded-full cursor-pointer" height="100" id="profileImage" onclick="triggerFileUpload()" src="./Assets/UserAvtar.png" width="100" />
+            </div>
+            <div class="text-center mb-4">
+                <label class="form-label">
+                    Profile Photo Upload
+                </label>
+                <input accept="image/*" class="hidden" id="profileUpload" onchange="previewImage(event)" type="file" />
+                <label class="cursor-pointer text-blue-500" for="profileUpload">
+                    Choose File
+                </label>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <input class="border border-gray-300 p-2 rounded w-full" id="firstName" placeholder="First Name" type="text" />
+                    <div class="warning-text" id="firstNameWarning">
+                    </div>
+                </div>
+                <div>
+                    <input class="border border-gray-300 p-2 rounded w-full" id="lastName" placeholder="Last Name" type="text" />
+                    <div class="warning-text" id="lastNameWarning">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <input class="border border-gray-300 p-2 w-full rounded" id="email" placeholder="Email Address" type="email" />
+                <div class="warning-text" id="emailWarning">
+                </div>
+            </div>
+            <div class="mb-4">
+                <input class="border border-gray-300 p-2 w-full rounded" id="password" oninput="checkPasswordStrength()" placeholder="Password" type="password" />
+                <div class="warning-text" id="passwordWarning">
+                </div>
+                <div class="strength-indicator" id="strengthIndicator">
+                </div>
+            </div>
+            <div class="mb-4">
+                <input class="border border-gray-300 p-2 w-full rounded" id="confirmPassword" placeholder="Confirm Password" type="password" />
+                <div class="warning-text" id="confirmPasswordWarning">
+                </div>
+                <div class="warning-text" id="passwordMatchWarning">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <input class="border border-gray-300 p-2 rounded w-full" id="dateOfBirth" placeholder="Date of Birth" type="date" />
+                    <div class="warning-text" id="dateOfBirthWarning">
+                    </div>
+                </div>
+                <div>
+                    <select class="border border-gray-300 p-2 rounded w-full" id="gender">
+                        <option value="">
+                            Gender
+                        </option>
+                        <option value="male">
+                            Male
+                        </option>
+                        <option value="female">
+                            Female
+                        </option>
+                        <option value="other">
+                            Other
+                        </option>
+                    </select>
+                    <div class="warning-text" id="genderWarning">
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mb-4">
+                <input class="mr-2" id="termsCheckbox" type="checkbox" />
+                <label class="form-label" for="termsCheckbox">
+                    I agree to the Terms and Conditions
+                </label>
+                <div class="warning-text" id="termsWarning">
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="register-btn p-2 rounded w-full" type="submit">
+                    Register
+                </button>
+            </div>
+        </form>
+        <div class="popup" id="popup">
+        </div>
+    </div>
+</body>
+</html>
